@@ -1,0 +1,24 @@
+.row-container {
+  display: flex;
+  align-items: flex-start;
+}
+.row-text {
+  width: 200px;
+  font-size: 29px;
+}
+.row-container1 {
+  flex: 0 0 auto;
+  width: 245px;
+  height: 39px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.row-textinput {
+  align-self: flex-end;
+}
+
+
+
+
+

@@ -1,0 +1,20 @@
+.upload-container {
+  width: 535px;
+  display: flex;
+  align-items: flex-start;
+}
+.upload-text {
+  font-size: 29px;
+}
+.upload-container1 {
+  flex: 0 0 auto;
+  width: 151px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.upload-root-class-name {
+  margin-top: var(--dl-space-space-unit);
+}

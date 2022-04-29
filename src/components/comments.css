@@ -1,0 +1,23 @@
+.comments-container {
+  width: 820px;
+  height: 172px;
+  display: flex;
+  align-items: flex-start;
+}
+.comments-text {
+  font-size: 29px;
+}
+.comments-container1 {
+  flex: 0 0 auto;
+  width: 457px;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.comments-textarea {
+  width: 438px;
+  height: 189px;
+  align-self: flex-end;
+}
+
