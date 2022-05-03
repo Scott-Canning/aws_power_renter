@@ -9,6 +9,7 @@ import BlankTemplate from './views/blank-template'
 import Home from './views/home'
 import AddReview from './views/add-review'
 import SignIn from './views/sign-in'
+import Map from './views/map'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route exact component={Home} path="/" />
         <Route exact component={AddReview} path="/add-review" />
         <Route exact component={SignIn} path="/sign-in" />
+        <Route exact component={Map} path="/map" />
       </div>
     </Router>
   )
