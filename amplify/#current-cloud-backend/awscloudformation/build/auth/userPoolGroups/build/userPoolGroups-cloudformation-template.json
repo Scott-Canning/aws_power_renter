@@ -1,0 +1,262 @@
+{
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.1.0\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "AuthRoleArn": {
+      "Type": "String"
+    },
+    "UnauthRoleArn": {
+      "Type": "String"
+    },
+    "authawspowerrenter6afb55d5UserPoolId": {
+      "Type": "String",
+      "Default": "authawspowerrenter6afb55d5UserPoolId"
+    },
+    "authawspowerrenter6afb55d5IdentityPoolId": {
+      "Type": "String",
+      "Default": "authawspowerrenter6afb55d5IdentityPoolId"
+    },
+    "authawspowerrenter6afb55d5AppClientID": {
+      "Type": "String",
+      "Default": "authawspowerrenter6afb55d5AppClientID"
+    },
+    "authawspowerrenter6afb55d5AppClientIDWeb": {
+      "Type": "String",
+      "Default": "authawspowerrenter6afb55d5AppClientIDWeb"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "PowerRenterUserPoolGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "authawspowerrenter6afb55d5UserPoolId"
+        },
+        "Description": "override success",
+        "GroupName": "PowerRenterUserPool",
+        "Precedence": 1,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "PowerRenterUserPoolGroupRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "PowerRenterUserPoolGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authawspowerrenter6afb55d5IdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authawspowerrenter6afb55d5UserPoolId"
+              },
+              "-PowerRenterUserPoolGroupRole"
+            ]
+          ]
+        }
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            },
+            "PolicyName": "UserGroupLogPolicy"
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cognito-identity:SetIdentityPoolRoles",
+                    "cognito-identity:ListIdentityPools",
+                    "cognito-identity:describeIdentityPool"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": "UserGroupExecutionPolicy"
+          },
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "iam:PassRole"
+                  ],
+                  "Resource": [
+                    {
+                      "Ref": "AuthRoleArn"
+                    },
+                    {
+                      "Ref": "UnauthRoleArn"
+                    }
+                  ]
+                }
+              ]
+            },
+            "PolicyName": "UserGroupPassRolePolicy"
+          }
+        ],
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "awspowerrenter6afb55d5",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "awspowerrenter6afb55d5-ExecutionRole-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "RoleMapFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "const response = require('cfn-response');\nconst AWS = require('aws-sdk');\nexports.handler = (event, context) => {\n  if (event.RequestType == 'Delete') {\n    response.send(event, context, response.SUCCESS, { message: 'Request type delete' });\n  }\n  if (event.RequestType == 'Create' || event.RequestType == 'Update') {\n    let { identityPoolId, appClientID, appClientIDWeb, userPoolId, region } = event.ResourceProperties;\n    try {\n      const cognitoidentity = new AWS.CognitoIdentity();\n      let params = {\n        IdentityPoolId: identityPoolId,\n        Roles: {\n          authenticated: event.ResourceProperties.AuthRoleArn,\n          unauthenticated: event.ResourceProperties.UnauthRoleArn,\n        },\n        RoleMappings: {},\n      };\n      if (appClientIDWeb) {\n        params.RoleMappings[`cognito-idp.${region}.amazonaws.com/${userPoolId}:${appClientIDWeb}`] = {\n          Type: 'Token',\n          AmbiguousRoleResolution: 'AuthenticatedRole',\n        };\n      }\n      if (appClientID) {\n        params.RoleMappings[`cognito-idp.${region}.amazonaws.com/${userPoolId}:${appClientID}`] = {\n          Type: 'Token',\n          AmbiguousRoleResolution: 'AuthenticatedRole',\n        };\n      }\n      cognitoidentity.setIdentityPoolRoles(params).promise();\n      response.send(event, context, response.SUCCESS, { message: 'Successfully updated identity pool.' });\n    } catch (err) {\n      response.send(event, context, response.FAILED, { message: 'Error updating identity pool' });\n    }\n  }\n};\n"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Handler": "index.handler",
+        "Runtime": "nodejs12.x",
+        "Timeout": 300
+      }
+    },
+    "RoleMapFunctionInput": {
+      "Type": "Custom::LambdaCallout",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "RoleMapFunction",
+            "Arn"
+          ]
+        },
+        "AuthRoleArn": {
+          "Ref": "AuthRoleArn"
+        },
+        "UnauthRoleArn": {
+          "Ref": "UnauthRoleArn"
+        },
+        "identityPoolId": {
+          "Ref": "authawspowerrenter6afb55d5IdentityPoolId"
+        },
+        "userPoolId": {
+          "Ref": "authawspowerrenter6afb55d5UserPoolId"
+        },
+        "appClientIDWeb": {
+          "Ref": "authawspowerrenter6afb55d5AppClientIDWeb"
+        },
+        "appClientID": {
+          "Ref": "authawspowerrenter6afb55d5AppClientID"
+        },
+        "region": {
+          "Ref": "AWS::Region"
+        },
+        "env": {
+          "Ref": "env"
+        }
+      },
+      "DependsOn": [
+        "RoleMapFunction"
+      ],
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
+    }
+  },
+  "Outputs": {
+    "PowerRenterUserPoolGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "PowerRenterUserPoolGroupRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

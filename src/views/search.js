@@ -7,15 +7,17 @@ import Footer from '../components/footer'
 import './search.css'
 
 const Search = (props) => {
+
   return (
     <div className="search-container">
       <Helmet>
         <title>Search - Creative Agency Page</title>
         <meta property="og:title" content="Search - Creative Agency Page" />
       </Helmet>
-      <Navigation rootClassName="navigation-root-class-name"></Navigation>
+      <Navigation rootClassName="navigation-root-class-name" signedIn={props.signedIn}></Navigation>
       <div className="search-container1">
         <div className="search-container2"></div>
+       
         <input
           type="text"
           placeholder="placeholder"

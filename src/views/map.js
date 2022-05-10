@@ -1,10 +1,7 @@
 import React, {useState} from 'react'
-
 import { Helmet } from 'react-helmet'
-
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
-
 import Amplify, { Auth, Signer } from 'aws-amplify'
 import ReactMapGL, {
   NavigationControl,
@@ -12,7 +9,7 @@ import ReactMapGL, {
   ViewportProps,
 } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import Location from "aws-sdk/clients/location"
+// import Location from "aws-sdk/clients/location"
 import awsconfig from "../aws-exports.js"
 import { Marker, Popup } from 'react-map-gl';
 import pin from '../pin.png'
