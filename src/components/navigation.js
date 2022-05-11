@@ -1,12 +1,11 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-
 import PropTypes from 'prop-types'
-
 import NavigationLinks from './navigation-links'
 import './navigation.css'
 
 const Navigation = (props) => {
+  
+
   return (
     <header
       data-role="Header"
@@ -19,12 +18,6 @@ const Navigation = (props) => {
             rootClassName="navigation-links-root-class-name17"
             className=""
           ></NavigationLinks>
-          <Link
-            to="/sign-in"
-            className="navigation-register button-secondary button button-md"
-          >
-            {props.button}
-          </Link>
         </div>
         <div data-type="BurgerMenu" className="navigation-burger-menu">
           <svg viewBox="0 0 1024 1024" className="navigation-icon">

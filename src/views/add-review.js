@@ -1,7 +1,6 @@
 import React from 'react'
-
 import { Helmet } from 'react-helmet'
-
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import Navigation from '../components/navigation'
 import Row from '../components/row'
 import Comments from '../components/comments'
@@ -247,15 +246,7 @@ const AddReview = (props) => {
       </div>
       <Footer rootClassName="footer-root-class-name3"></Footer>
     </div>
-  )
+  ) 
 }
 
-export default AddReview
-
-
-
-
-
-
-
-
+export default withAuthenticator(AddReview)
