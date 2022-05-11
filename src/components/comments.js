@@ -12,6 +12,9 @@ const Comments = (props) => {
         <textarea
           placeholder={props.textarea_placeholder}
           className="comments-textarea textarea"
+          value={props.userVal}
+          onChange={(e) => props.setVal(e.target.value)}
+          required
         ></textarea>
       </div>
     </div>

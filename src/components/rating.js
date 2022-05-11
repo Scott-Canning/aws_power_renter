@@ -11,11 +11,11 @@ const Rating = (props) => {
         <div className="rating-container2">
           <span className="rating-text">{props.text1}</span>
           <div className="rating-container3">
-            <input type="radio" name="radio" className="rating-radiobutton" />
-            <input type="radio" name="radio" className="rating-radiobutton1" />
-            <input type="radio" name="radio" className="rating-radiobutton2" />
-            <input type="radio" name="radio" className="rating-radiobutton3" />
-            <input type="radio" name="radio" className="rating-radiobutton4" />
+            <input type="radio" name="radio" className="rating-radiobutton" value={props.userVal} onChange={(e) => props.setVal(1)}/>
+            <input type="radio" name="radio" className="rating-radiobutton1" value={props.userVal} onChange={(e) => props.setVal(2)}/>
+            <input type="radio" name="radio" className="rating-radiobutton2" value={props.userVal} onChange={(e) => props.setVal(3)}/>
+            <input type="radio" name="radio" className="rating-radiobutton3" value={props.userVal} onChange={(e) => props.setVal(4)}/>
+            <input type="radio" name="radio" className="rating-radiobutton4" value={props.userVal} onChange={(e) => props.setVal(5)}/>
           </div>
         </div>
         <div className="rating-container4">

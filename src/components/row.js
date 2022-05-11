@@ -13,6 +13,9 @@ const Row = (props) => {
           type="text"
           placeholder={props.textinput_placeholder}
           className="row-textinput input"
+          value={props.userVal}
+          onChange={(e) => props.setVal(e.target.value)}
+          required
         />
       </div>
     </div>

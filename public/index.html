@@ -3,6 +3,17 @@
 <html lang="en">
   <head>
     <title>Creative Agency Page</title>
+    <script type="text/JavaScript" src="./sdk/lib/axios/dist/axios.standalone.js" ></script>
+    <script type="text/JavaScript" src="./sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/url-template/url-template.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/JavaScript" src="./sdk/lib/apiGatewayCore/utils.js"></script>
+    <script type="text/JavaScript" src="./sdk/apigClient.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -42,6 +53,11 @@
     </style>
   </head>
   <body>
+    <script>
+
+      window.sdk = apigClientFactory.newClient({});
+
+    </script>
     <div id="app"></div>
     <script src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
     <script>

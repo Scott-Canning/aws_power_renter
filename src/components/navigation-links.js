@@ -20,6 +20,9 @@ const NavigationLinks = (props) => {
       <Link to="/search" className="navigation-links-navlink2 navigation-Link">
         {props.link3}
       </Link>
+      <Link to="/map" className="navigation-links-navlink2 navigation-Link">
+        {props.link4}
+      </Link>
       <Link
         to="/add-review"
         className="navigation-links-navlink3 navigation-Link"
@@ -36,6 +39,7 @@ NavigationLinks.defaultProps = {
   rootClassName: '',
   link2: 'About',
   link1: 'Home',
+  link4: 'Map',
 }
 
 NavigationLinks.propTypes = {
