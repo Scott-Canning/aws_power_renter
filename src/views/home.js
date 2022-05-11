@@ -1,7 +1,5 @@
 import React from 'react'
-
 import { Helmet } from 'react-helmet'
-
 import Navigation from '../components/navigation'
 import ServicesCard from '../components/services-card'
 import BlogCard from '../components/blog-card'
@@ -9,6 +7,8 @@ import Footer from '../components/footer'
 import './home.css'
 
 const Home = (props) => {
+
+  
   return (
     <div className="home-container">
       <Helmet>
