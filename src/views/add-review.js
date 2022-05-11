@@ -7,10 +7,122 @@ import Comments from '../components/comments'
 import Rating from '../components/rating'
 import Upload from '../components/upload'
 import Footer from '../components/footer'
+import { useState } from "react"
+import AWS from 'aws-sdk'
 import './add-review.css'
 
+const S3_BUCKET ='power-renter-user-photos';
+const REGION ='us-east-1';
+
+// Currently using the power renter map unautharized identity, this should maybe be updated?
+AWS.config.update({
+  region: REGION,
+  credentials: new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-1:a95d1dad-aef6-4d50-973a-a25452ffc607',
+  })
+});
+
+const myBucket = new AWS.S3({
+    params: { Bucket: S3_BUCKET},
+    region: REGION,
+})
 
 const AddReview = (props) => {
+  const [addr1, setAddr1] = useState("");
+  const [addr2, setAddr2] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
+  const [comments, setComments] = useState("");
+  const [rating, setRating] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [progress , setProgress] = useState(0);
+  const [apiResponse , setApiResponse] = useState("");
+  const [loadingStarted , setLoadingStarted] = useState(false);
+  const [loadingDone , setLoadingDone] = useState(false);
+
+
+  function uploadPhoto(params) {
+    myBucket.putObject(params)
+    .on('httpUploadProgress', (evt) => {
+        setProgress(Math.round((evt.loaded / evt.total) * 100))
+    })
+    .send((err) => {
+      if (err){
+        console.log(err)
+      }
+    })
+    return(true);
+  };
+
+  // async function uploadPhoto(params) {
+  // }
+  function sendToApiGateWay(file){
+    const review_body = {
+      userReview: {
+        user: "testUserMaxChrist",
+        comment: comments,
+        rating: rating,
+        address: {
+          line1: addr1,
+          line2: addr2,
+          city: city,
+          state: state,
+          zip: zip
+        },
+        userImage: file.name
+      }
+    };
+
+    console.log(review_body);
+
+    window.sdk.uploadPut({}, review_body, {})
+      .then(response => {
+        console.log(response);
+        setApiResponse(response['data']['body']);
+        //console.log(response.data);
+        //setLoading(false);
+      })
+      .catch(error => {
+        console.log(
+          "Encountered an error when posting data",
+          error
+        );
+        setApiResponse("There was an issue posting data to the server. Please try again.")
+      });
+
+    setAddr1('');
+    setAddr2('');
+    setCity('');
+    setState('');
+    setZip('');
+    setComments('');
+    setRating('');
+    setSelectedFile('');
+    setProgress(0);
+    setLoadingDone(true)
+  };
+
+  const uploadFile = (file) => {
+    const params = {
+          Body: file,
+          Bucket: S3_BUCKET,
+          Key: file.name,
+      };
+    
+    console.log(params);
+    setLoadingStarted(true);
+    setTimeout(sendToApiGateWay(file),5000);
+
+    uploadPhoto(params);
+  } 
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    uploadFile(selectedFile);
+    //alert(`The address1 you entered was: ${apiResponse}`)
+  }
+//<div class="loader-spinner"></div>
   return (
     <div className="add-review-container">
       <Helmet>
@@ -19,8 +131,12 @@ const AddReview = (props) => {
       </Helmet>
       <Navigation rootClassName="navigation-root-class-name3"></Navigation>
       <div className="add-review-container1">
-        <h1 className="add-review-text">Add A Review</h1>
-        <form className="add-review-form">
+      <h1 className="add-review-text">Add A Review</h1>
+      
+      <div>
+      {loadingDone==false && loadingStarted == false ? 
+
+        <form className="add-review-form" onSubmit={handleSubmit}>
           <div className="add-review-container2">
             <div className="add-review-container3">
               <span className="add-review-text1">Address</span>
@@ -29,26 +145,36 @@ const AddReview = (props) => {
               text1="Address Line 1"
               rootClassName="row-root-class-name"
               textinput_placeholder="23 Main St"
+              userVal={addr1}
+              setVal={setAddr1}
             ></Row>
             <Row
               text1="Address Line 2"
               rootClassName="row-root-class-name1"
               textinput_placeholder="Apt 6"
+              userVal={addr2}
+              setVal={setAddr2}
             ></Row>
             <Row
               text1="City"
               rootClassName="row-root-class-name2"
               textinput_placeholder="Brooklyn"
+              userVal={city}
+              setVal={setCity}
             ></Row>
             <Row
               text1="State"
               rootClassName="row-root-class-name3"
               textinput_placeholder="NY"
+              userVal={state}
+              setVal={setState}
             ></Row>
             <Row
               text1="Zip"
               rootClassName="row-root-class-name4"
               textinput_placeholder="11226"
+              userVal={zip}
+              setVal={setZip}
             ></Row>
             <div className="add-review-container4">
               <span className="add-review-text2">Review</span>
@@ -56,14 +182,25 @@ const AddReview = (props) => {
             <Comments
               rootClassName="comments-root-class-name"
               textarea_placeholder="Enter comments or complaints here."
+              userVal={comments}
+              setVal={setComments}
             ></Comments>
-            <Rating rootClassName="rating-root-class-name"></Rating>
-            <Upload rootClassName="upload-root-class-name"></Upload>
+            <Rating rootClassName="rating-root-class-name"
+                    userVal={rating}
+                    setVal={setRating}
+            ></Rating>
+            <Upload rootClassName="upload-root-class-name"
+                    userVal={selectedFile}
+                    setVal={setSelectedFile}
+            ></Upload>
+            <div>File Upload Progress is {progress}%</div>
+            
             <button className="add-review-button button">
               <span className="add-review-text3 button-primary button">
                 Submit
               </span>
             </button>
+            <div className="add-review-container5">{apiResponse}</div>
             <div className="add-review-container5">
               <a
                 href="https://portal.311.nyc.gov/report-problems/"
@@ -99,6 +236,13 @@ const AddReview = (props) => {
             </div>
           </div>
         </form>
+
+        : apiResponse ? <div>
+                              <div>{apiResponse}</div>
+                              <div className="add-review-container5">Please reload the page to make another review.</div>
+                              </div>: <div>
+                              <div className="loader-spinner"></div></div>} </div>
+        
       </div>
       <Footer rootClassName="footer-root-class-name3"></Footer>
     </div>

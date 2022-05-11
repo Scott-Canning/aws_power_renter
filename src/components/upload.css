@@ -1,20 +1,41 @@
 .upload-container {
-  width: 535px;
+  width: 800px;
   display: flex;
   align-items: flex-start;
 }
 .upload-text {
   font-size: 29px;
+  margin-right: var(--dl-space-space-unit);
 }
 .upload-container1 {
   flex: 0 0 auto;
-  width: 151px;
+  width: 500px;
   height: 37px;
   display: flex;
   align-items: center;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: left;
 }
 .upload-root-class-name {
   margin-top: var(--dl-space-space-unit);
 }
+
+.choose-file {
+  width: 230px;
+}
+/* 
+.upload-file {
+  color: var(--dl-color-scheme-white);
+  cursor: pointer;
+  font-style: normal;
+  transition: 0.3s;
+  font-weight: 700;
+  line-height: 1;
+  border-color: transparent;
+  border-radius: var(--dl-radius-radius-radius4);
+  background-color: var(--dl-color-scheme-brown);
+}
+.upload-file:hover {
+  color: var(--dl-color-scheme-darkblue);
+  background-color: rgba(0, 0, 0, 0.1);
+} */
