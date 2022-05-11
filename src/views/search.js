@@ -13,6 +13,7 @@ import { Marker, Popup } from 'react-map-gl';
 import pin from '../pin.png'
 import "mapbox-gl/dist/mapbox-gl.css"
 import './search.css'
+import axios from 'axios';
 
 Amplify.configure(awsconfig);
 const mapName = "apartmentmap-testing";
@@ -39,7 +40,7 @@ const transformRequest = (credentials) => (
 
 const Search = (props) => {
   const [search, setSearch] = React.useState("");
-  //const [searchResponse, setSearchResponse] = React.useState([]);
+  const [searchResponse, setSearchResponse] = React.useState([]);
   const [credentials, setCredentials] = useState(null);
   const [showPopup, setShowPopup] = React.useState(true);
   const [viewport, setViewport] = useState({
@@ -56,10 +57,7 @@ const Search = (props) => {
   }, []);
 
   async function searchClicked() {
-    /*
-    >>> skeleton function:
-
-    const base_url = '';
+    const base_url = 'https://k8edkfkr04.execute-api.us-east-1.amazonaws.com/Dev/search?q=';
     const params = search;
     const url = base_url + params;
     let response;
@@ -70,13 +68,10 @@ const Search = (props) => {
       alert("No apartments matched your query.")
       setSearchResponse([]);
     }
+    setSearchResponse(response.data.body);
+    console.log("data: ", response.data);
+    console.log("searchResponse: ", searchResponse);
 
-    setSearchResponse(response.data);
-    console.log(response.data);
-
-    >>>
-    */
-    console.log("temp message: ", search)
   };
 
   return (
