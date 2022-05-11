@@ -43,9 +43,6 @@ const NavigationLinks = (props) => {
       >
         {props.link31}
       </Link>
-      <Link to="/map" className="navigation-links-navlink2 navigation-Link">
-        {props.link4}
-      </Link>
       <Link
         to="/login"
         className="navigation-links-navlink3 navigation-Link"
