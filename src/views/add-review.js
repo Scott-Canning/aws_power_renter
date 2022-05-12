@@ -17,7 +17,7 @@ const REGION ='us-east-1';
 var username = ""
 
 Auth.currentAuthenticatedUser().then((user) => {
-  console.log('username = ' + user.username);
+  // console.log('username = ' + user.username);
   username = user.username
 });
 
