@@ -1,4 +1,4 @@
-import React , {useState} from 'react'
+import React , { useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import Footer from '../components/footer'
@@ -46,17 +46,21 @@ const Search = (props) => {
   const [searchResponse, setSearchResponse] = React.useState(undefined);
   const [credentials, setCredentials] = useState(null);
   const [showPopup, setShowPopup] = React.useState(true);
+  const [buttonClicked, setButtonClick] = React.useState(false);
+  const [apartmentDetails, setApartmentDetails] = React.useState({});
   const [viewport, setViewport] = useState({
     longitude: -73.984016,
     latitude: 40.754932,
     zoom: 11,
   });
 
+
   React.useEffect(() => {
     const fetchCredentials = async () => {
       setCredentials(await Auth.currentUserCredentials());
     };
     fetchCredentials();
+
   }, []);
 
   async function searchClicked() {
@@ -74,6 +78,7 @@ const Search = (props) => {
       let parsed = JSON.parse(response.data.body);
       console.log("parsed: ", parsed);
       setSearchResponse(parsed);
+      setButtonClick(false);
     } catch(err) {
       alert("No apartments matched your query.");
       console.log("error: ", err);
@@ -108,8 +113,8 @@ const Search = (props) => {
   }
 
   const Apartment = ({apartment}) => (
-      <Card className="card">
-       <Card.Img variant="top" src={apartment.imgSrc} />
+    <Card className="card">
+      <Card.Img variant="top" src={apartment.imgSrc} />
       <Card.Body>
         <Card.Title>
           <b>{apartment.address.streetAddress} {apartment.address.zipcode} {apartment.address.neighborhood} {apartment.address.city} {apartment.address.state}</b>
@@ -121,10 +126,10 @@ const Search = (props) => {
             </Card.Text>
             <b><i>PowerRenter insights:</i></b>
             <Card.Text>
-              311 Complaints: {apartment.violations.length}
+              311 Complaints: {apartment.complaints.length}
             </Card.Text>
             <Card.Text>
-              Violations: {apartment.complaints.length}
+              Violations: {apartment.violations.length}
             </Card.Text>
           </div>
           <div className="column">
@@ -138,27 +143,70 @@ const Search = (props) => {
     </Card>
   )
 
-  function ExpandDetailsClicked({apartment}) {
-    return (
-      <ApartmentDetails apartment={apartment}  style={{visibility: 'visible'}}/>
-    )
+  const ExpandDetailsClicked = ({apartment}) => { 
+    setButtonClick(true);
+    setApartmentDetails(apartment);
   }
 
-  const ApartmentDetails = ({apartment}) => {
+  const HideDetailsClicked = () => { 
+    setButtonClick(false);
+    setApartmentDetails({});
+  }
+
+
+  const ApartmentDetails = () => {
+    let apartment = apartmentDetails;
+    console.log("TEST: ", apartment.complaints[0])
+    console.log("TEST: ", apartment.violations[0])
     if (apartment != undefined) {
       return (
         <div>
           <Card className="card-large">
+            <Card.Img variant="top-large" src={apartment.imgSrc} />
             <Card.Body>
               <Card.Title>
               <b>{apartment.address.streetAddress} {apartment.address.zipcode} {apartment.address.neighborhood} {apartment.address.city} {apartment.address.state}</b>
               </Card.Title>
+              <div className="row">
+                <div className="column">
+                  <Card.Text>
+                    Price: ${apartment.price}
+                  </Card.Text>
+                  </div>
+                  <div className="column">
+                  <Card.Text>
+                    Bedrooms: {apartment.bedrooms}
+                  </Card.Text>
+                  </div>
+                  <div className="column">
+                  <Card.Text>
+                    Bathrooms: {apartment.bathrooms}
+                  </Card.Text>
+                  </div>
+              </div>
               <Card.Text>
-                Some quick example text to build on the card title and make up the bulk of
-                the card's content.
-                {/* {apartment.price} */}
+                <b>Description:</b> {(apartment.description).substring(0,250)}...
               </Card.Text>
+              <div>
+                <b>311 Complaints</b>
+                { apartment.complaints.length != 0 ? apartment.complaints.map((_, i) => { 
+                    return <li key={i}>{apartment.complaints[i].date.substring(0,10)} [ Status: {apartment.complaints[i].status} ] {apartment.complaints[i].desc}  </li>
+                  }) : (
+                    null
+                  )
+                }
+              </div>
+              <div>
+                <b>Housing Violations</b>
+                { apartment.violations.length != 0 ? apartment.violations.map((_, i) => { 
+                    // return <li key={i}>{apartment.violations[i].date.substring(0,10)} [ Status: {apartment.violations[i].status} ] {apartment.violations[i].desc}  </li>
+                  }) : (
+                    null
+                  )
+                }
+              </div>
             </Card.Body>
+            <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => HideDetailsClicked()}>Hide Details</Button>
           </Card>
         </div>
       );
@@ -229,8 +277,16 @@ const Search = (props) => {
           <h1>Loading...</h1>
         )}
       </div>
-      <RenderResponse/>
-      <ApartmentDetails/>
+      <div className="row">
+          <div className="column">
+            <RenderResponse/>
+          </div>
+          <div className="column">
+            <div className="result-cards">
+              {buttonClicked ? <ApartmentDetails/> : null }
+            </div>
+          </div>
+      </div>
       <Footer rootClassName="footer-root-class-name"></Footer>
     </div>
   )
