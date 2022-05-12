@@ -8,11 +8,6 @@ import BlankTemplate from './views/blank-template'
 import Home from './views/home'
 import AddReview from './views/add-review'
 import Login from './views/login'
-import { Amplify } from 'aws-amplify';
-import awsExports from './aws-exports';
-import '@aws-amplify/ui-react/styles.css';
-
-Amplify.configure(awsExports);
 
 const App = () => {
   return (
