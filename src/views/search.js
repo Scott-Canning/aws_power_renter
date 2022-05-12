@@ -45,13 +45,16 @@ const Search = (props) => {
   const [zillow, setZillow] = React.useState(true);
   const [searchResponse, setSearchResponse] = React.useState(undefined);
   const [credentials, setCredentials] = useState(null);
-  const [showPopup, setShowPopup] = React.useState(true);
   const [buttonClicked, setButtonClick] = React.useState(false);
   const [apartmentDetails, setApartmentDetails] = React.useState({});
   const [viewport, setViewport] = useState({
     longitude: -73.984016,
     latitude: 40.754932,
     zoom: 11,
+  });
+  const [currentlySelectedPin, setCurrentlySelectedPin] = useState({
+    longitude: '',
+    latitude: ''
   });
 
 
@@ -78,6 +81,11 @@ const Search = (props) => {
       let parsed = JSON.parse(response.data.body);
       console.log("parsed: ", parsed);
       setSearchResponse(parsed);
+      setViewport({
+        longitude: parsed[0].longitude,
+        latitude: parsed[0].latitude,
+        zoom: 11,
+      });
       setButtonClick(false);
     } catch(err) {
       alert("No apartments matched your query.");
@@ -214,6 +222,64 @@ const Search = (props) => {
     return null
   }
   
+  const RenderMapPins = () => {
+    const response = searchResponse;
+    if (response === undefined) {
+      return (
+        null
+      )
+    } else if (response.length != 0) {
+        return (
+              response.map((apartment, i) => (
+                <Marker key={i} longitude={apartment.longitude} 
+                        latitude={apartment.latitude} 
+                        anchor="bottom" 
+                        onClick={() => setCurrentlySelectedPin({longitude: apartment.longitude,latitude: apartment.latitude})}>
+                  <img src={pin} width="30" height="30"/>
+                </Marker>
+              ))    
+        )
+    }
+    return (
+      null
+    )
+  }
+
+  const RenderMapPinPopUps = () => {
+    const response = searchResponse;
+    if (response === undefined) {
+      return (
+        null
+      )
+    } else if (response.length != 0) {
+        return (
+              response.map((apartment, i) => (popupHider(apartment, i)))   
+        )
+    }
+    return (
+      null
+    )
+  }
+
+  function popupHider(apartment, i) {                
+    if (currentlySelectedPin.latitude === apartment.latitude && currentlySelectedPin.longitude === apartment.longitude){
+      return (
+        <Popup  key={i} longitude={apartment.longitude}  latitude={apartment.latitude} 
+        anchor="bottom"
+        onClose={() => setCurrentlySelectedPin({longitude: '',latitude: ''})}>
+        <div>
+        <div>{apartment.search_address}</div>
+        <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => ExpandDetailsClicked({apartment})}>Expand Details</Button>
+        </div>
+        </Popup>
+      )
+    } else {
+      return (
+        null
+      )
+    }   
+  }
+
 
   return (
     <div className="search-container">
@@ -258,16 +324,8 @@ const Search = (props) => {
             mapStyle={mapName}
             onViewStateChange={setViewport}
           >
-          <Marker longitude={-73.984016} latitude={40.756932} anchor="bottom" >
-            <img src={pin} width="30" height="30"/>
-          </Marker>
-
-          {showPopup && (
-          <Popup longitude={-73.984016} latitude={40.754932}
-            anchor="bottom"
-            onClose={() => setShowPopup(false)}>
-            You are here
-          </Popup>)}
+          <RenderMapPins/>
+          <RenderMapPinPopUps/>
 
             <div style={{ position: "relative", left: 20, top:120 }}>
               <NavigationControl showCompass={false} />
