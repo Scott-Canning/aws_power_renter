@@ -14,6 +14,8 @@ import pin from '../pin.png'
 import "mapbox-gl/dist/mapbox-gl.css"
 import './search.css'
 import axios from 'axios';
+import { Card, Button } from 'react-bootstrap';
+
 
 Amplify.configure(awsconfig);
 const mapName = "apartmentmap-testing";
@@ -40,7 +42,8 @@ const transformRequest = (credentials) => (
 
 const Search = (props) => {
   const [search, setSearch] = React.useState("");
-  const [searchResponse, setSearchResponse] = React.useState([]);
+  const [zillow, setZillow] = React.useState(true);
+  const [searchResponse, setSearchResponse] = React.useState(undefined);
   const [credentials, setCredentials] = useState(null);
   const [showPopup, setShowPopup] = React.useState(true);
   const [viewport, setViewport] = useState({
@@ -57,22 +60,112 @@ const Search = (props) => {
   }, []);
 
   async function searchClicked() {
-    const base_url = 'https://k8edkfkr04.execute-api.us-east-1.amazonaws.com/Dev/search?q=';
-    const params = search;
-    const url = base_url + params;
-    let response;
-    try {
-      response = await axios.get(url);
-      setSearchResponse(response.data);
-    } catch(err) {
-      alert("No apartments matched your query.")
-      setSearchResponse([]);
+    const base_url = "https://k8edkfkr04.execute-api.us-east-1.amazonaws.com/Dev/";
+    const search_params = search;
+    let zillow_param = "Yes";
+    console.log(zillow);
+    if (zillow) {
+      zillow_param = "";
     }
-    setSearchResponse(response.data.body);
-    console.log("data: ", response.data);
-    console.log("searchResponse: ", searchResponse);
-
+    const url = base_url + "search?q=" + search_params + "&skipZillow=" + zillow_param;
+    console.log("[testing] search terms: ", search);
+    try {
+      let response = await axios.get(url);
+      let parsed = JSON.parse(response.data.body);
+      console.log("parsed: ", parsed);
+      setSearchResponse(parsed);
+    } catch(err) {
+      alert("No apartments matched your query.");
+      console.log("error: ", err);
+    }
   };
+
+  const zillowCheckBox = () => {
+    setZillow(!zillow);
+  }
+
+  const RenderResponse = () => {
+    const response = searchResponse;
+    if (response === undefined) {
+      return (
+        <div>
+        </div>
+      )
+    } else if (response.length != 0) {
+        return (
+          <div className="result-cards">
+              {response.map((apartment, i) => (
+                <Apartment key={i} apartment={apartment} />
+              ))}
+          </div>
+        )
+    }
+    return (
+      <div>
+        No Results Matched Your Query
+      </div>
+    )
+  }
+
+  const Apartment = ({apartment}) => (
+      <Card className="card">
+       <Card.Img variant="top" src={apartment.imgSrc} />
+      <Card.Body>
+        <Card.Title>
+          <b>{apartment.address.streetAddress} {apartment.address.zipcode} {apartment.address.neighborhood} {apartment.address.city} {apartment.address.state}</b>
+        </Card.Title>
+        <div className="row">
+          <div className="column">
+            <Card.Text>
+              Price: ${apartment.price}
+            </Card.Text>
+            <b><i>PowerRenter insights:</i></b>
+            <Card.Text>
+              311 Complaints: {apartment.violations.length}
+            </Card.Text>
+            <Card.Text>
+              Violations: {apartment.complaints.length}
+            </Card.Text>
+          </div>
+          <div className="column">
+            <Card.Text>
+              {(apartment.description).substring(0,100)}...
+            </Card.Text>
+          </div>
+        </div>
+        <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => ExpandDetailsClicked({apartment})}>Expand Details</Button>
+      </Card.Body>
+    </Card>
+  )
+
+  function ExpandDetailsClicked({apartment}) {
+    return (
+      <ApartmentDetails apartment={apartment}  style={{visibility: 'visible'}}/>
+    )
+  }
+
+  const ApartmentDetails = ({apartment}) => {
+    if (apartment != undefined) {
+      return (
+        <div>
+          <Card className="card-large">
+            <Card.Body>
+              <Card.Title>
+              <b>{apartment.address.streetAddress} {apartment.address.zipcode} {apartment.address.neighborhood} {apartment.address.city} {apartment.address.state}</b>
+              </Card.Title>
+              <Card.Text>
+                Some quick example text to build on the card title and make up the bulk of
+                the card's content.
+                {/* {apartment.price} */}
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
+      );
+    }
+    return null
+  }
+  
 
   return (
     <div className="search-container">
@@ -91,8 +184,20 @@ const Search = (props) => {
                 value={search} 
                 onInput={e => setSearch(e.target.value)} 
                 onKeyDown={e => {if(e.key ==='Enter'){searchClicked()}}}/>
-          <div className="search-button">
-            <button  className="button-primary button" style={{margin: 'auto', width: '75%'}} onClick={searchClicked}> Search </button>
+          <div className="search-zillow-container">
+            <div className="search-button">
+              <button className="button-primary button" style={{margin: 'auto', width: '75%'}} onClick={searchClicked}> Search </button>
+            </div>
+            <div className="zillow-checkbox">
+              <div className="row">
+                <div className="column" style={{width: '24px'}}>
+                  <input type="checkbox" defaultChecked={zillow} onChange={zillowCheckBox}/>
+                </div>
+                <div className="column" style={{width: '20px'}}>
+                  <label>Zillow</label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div style={{height: '0px'}}/>
@@ -124,9 +229,12 @@ const Search = (props) => {
           <h1>Loading...</h1>
         )}
       </div>
+      <RenderResponse/>
+      <ApartmentDetails/>
       <Footer rootClassName="footer-root-class-name"></Footer>
     </div>
   )
 }
+
 
 export default Search
