@@ -10,9 +10,16 @@ import Footer from '../components/footer'
 import { useState } from "react"
 import AWS from 'aws-sdk'
 import './add-review.css'
+import { Auth } from 'aws-amplify'
 
 const S3_BUCKET ='power-renter-user-photos';
 const REGION ='us-east-1';
+var username = ""
+
+Auth.currentAuthenticatedUser().then((user) => {
+  console.log('username = ' + user.username);
+  username = user.username
+});
 
 // Currently using the power renter map unautharized identity, this should maybe be updated?
 AWS.config.update({
@@ -58,9 +65,10 @@ const AddReview = (props) => {
   // async function uploadPhoto(params) {
   // }
   function sendToApiGateWay(file){
+
     const review_body = {
       userReview: {
-        user: "testUserMaxChrist",
+        user: username,
         comment: comments,
         rating: rating,
         address: {
@@ -193,14 +201,14 @@ const AddReview = (props) => {
                     userVal={selectedFile}
                     setVal={setSelectedFile}
             ></Upload>
-            <div>File Upload Progress is {progress}%</div>
+            
             
             <button className="add-review-button button">
               <span className="add-review-text3 button-primary button">
                 Submit
               </span>
             </button>
-            <div className="add-review-container5">{apiResponse}</div>
+
             <div className="add-review-container5">
               <a
                 href="https://portal.311.nyc.gov/report-problems/"
@@ -250,3 +258,4 @@ const AddReview = (props) => {
 }
 
 export default withAuthenticator(AddReview)
+//<div>File Upload Progress is {progress}%</div>
