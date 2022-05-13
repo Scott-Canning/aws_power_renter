@@ -163,12 +163,20 @@ const Search = (props) => {
   )
 
   const ExpandDetailsClicked = ({apartment}) => { 
-    setDetailsButtonClicked(true);
-    setApartmentDetails(apartment);
-    window.scrollTo({
-      top: 700,
-      behavior: 'smooth',
-    });
+    if (zillow){
+      setDetailsButtonClicked(true);
+      setApartmentDetails(apartment);
+      window.scrollTo({
+        top: 700,
+        behavior: 'smooth',
+      });
+    } else {
+      window.scrollTo({
+        top: 700,
+        behavior: 'smooth',
+      });
+    }
+
   }
 
   const HideDetailsClicked = () => { 
@@ -343,7 +351,7 @@ const Search = (props) => {
       return (
         null
       )
-    } else if (response.length != 0) {
+    } else if (response.length != 0 && zillow) {
         return (
               response.map((apartment, i) => (
                 <Marker key={i} longitude={apartment.longitude} 
@@ -354,6 +362,15 @@ const Search = (props) => {
                 </Marker>
               ))    
         )
+    } else if (response.length != 0 && !zillow) {
+      return (
+        <Marker key={1} longitude={response.longitude} 
+          latitude={response.latitude} 
+          anchor="bottom" 
+          onClick={() => setCurrentlySelectedPin({longitude: response.longitude,latitude: response.latitude})}>
+          <img src={pin} width="30" height="30"/>
+        </Marker>
+      )
     }
     return (
       null
@@ -366,10 +383,14 @@ const Search = (props) => {
       return (
         null
       )
-    } else if (response.length != 0) {
+    } else if (response.length != 0 && zillow) {
         return (
               response.map((apartment, i) => (popupHider(apartment, i)))   
         )
+    } else if (response.length != 0 && !zillow) {
+      return(
+        popupHider(response, 1)
+      )
     }
     return (
       null
