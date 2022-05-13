@@ -45,7 +45,7 @@ const Search = (props) => {
   const [zillow, setZillow] = React.useState(true);
   const [searchResponse, setSearchResponse] = React.useState(undefined);
   const [credentials, setCredentials] = useState(null);
-  const [buttonClicked, setButtonClick] = React.useState(false);
+  const [detailsButtonClicked, setDetailsButtonClicked] = React.useState(false);
   const [apartmentDetails, setApartmentDetails] = React.useState({});
   const [viewport, setViewport] = useState({
     longitude: -73.984016,
@@ -69,40 +69,52 @@ const Search = (props) => {
   async function searchClicked() {
     const base_url = "https://k8edkfkr04.execute-api.us-east-1.amazonaws.com/Dev/";
     const search_params = search;
-    let zillow_param = "Yes";
-    console.log(zillow);
+    let zillow_param;
     if (zillow) {
       zillow_param = "";
-    }
-    const url = base_url + "search?q=" + search_params + "&skipZillow=" + zillow_param;
-    console.log("[testing] search terms: ", search);
-    try {
-      let response = await axios.get(url);
-      let parsed = JSON.parse(response.data.body);
-      console.log("parsed: ", parsed);
-      setSearchResponse(parsed);
-      setViewport({
-        longitude: parsed[0].longitude,
-        latitude: parsed[0].latitude,
-        zoom: 11,
-      });
-      setButtonClick(false);
-    } catch(err) {
-      alert("No apartments matched your query.");
-      console.log("error: ", err);
+      const url = base_url + "search?q=" + search_params + "&skipZillow=" + zillow_param;
+      console.log("[testing] search terms: ", search);
+      try {
+        let response = await axios.get(url);
+        let parsed = JSON.parse(response.data.body);
+        console.log("parsed: ", parsed);
+        setSearchResponse(parsed);
+        setDetailsButtonClicked(false);
+      } catch(err) {
+        alert("No apartments matched your query.");
+        console.log("error: ", err);
+      }
+    } else {
+      zillow_param = "Yes";
+      const url = base_url + "search?q=" + search_params + "&skipZillow=" + zillow_param;
+      console.log("[testing] search terms: ", search);
+      try {
+        let response = await axios.get(url);
+        let parsed = JSON.parse(response.data.body);
+        console.log("parsed: ", parsed[0]);
+        setSearchResponse(parsed[0]);
+        setDetailsButtonClicked(false);
+      } catch(err) {
+        alert("No apartments matched your query.");
+        console.log("error: ", err);
+      }
     }
   };
 
   const zillowCheckBox = () => {
-    setZillow(!zillow);
+    if(zillow && search != "") {
+      refreshPage();
+      setZillow(!zillow)
+    } else {
+      setZillow(!zillow);
+    }
   }
 
-  const RenderResponse = () => {
+  const RenderZillowResponse = () => {
     const response = searchResponse;
     if (response === undefined) {
       return (
-        <div>
-        </div>
+        <div></div>
       )
     } else if (response.length != 0) {
         return (
@@ -114,9 +126,7 @@ const Search = (props) => {
         )
     }
     return (
-      <div>
-        No Results Matched Your Query
-      </div>
+      <div>No Results Matched Your Query</div>
     )
   }
 
@@ -151,21 +161,8 @@ const Search = (props) => {
     </Card>
   )
 
-  const ExpandDetailsClicked = ({apartment}) => { 
-    setButtonClick(true);
-    setApartmentDetails(apartment);
-  }
-
-  const HideDetailsClicked = () => { 
-    setButtonClick(false);
-    setApartmentDetails({});
-  }
-
-
   const ApartmentDetails = () => {
     let apartment = apartmentDetails;
-    console.log("TEST: ", apartment.complaints[0])
-    console.log("TEST: ", apartment.violations[0])
     if (apartment != undefined) {
       return (
         <div>
@@ -176,42 +173,52 @@ const Search = (props) => {
               <b>{apartment.address.streetAddress} {apartment.address.zipcode} {apartment.address.neighborhood} {apartment.address.city} {apartment.address.state}</b>
               </Card.Title>
               <div className="row">
-                <div className="column">
+                <div>
                   <Card.Text>
                     Price: ${apartment.price}
                   </Card.Text>
                   </div>
-                  <div className="column">
+                  <div>
                   <Card.Text>
                     Bedrooms: {apartment.bedrooms}
                   </Card.Text>
                   </div>
-                  <div className="column">
+                  <div>
                   <Card.Text>
                     Bathrooms: {apartment.bathrooms}
                   </Card.Text>
                   </div>
               </div>
               <Card.Text>
-                <b>Description:</b> {(apartment.description).substring(0,250)}...
+                <b>Description:</b> {(apartment.description).substring(0,250)}... 
+                {apartment.url != "" ? <a href={apartment.url} target="_blank" style={{color: 'blue'}}>Read More</a> : null}
               </Card.Text>
               <div>
-                <b>311 Complaints</b>
-                { apartment.complaints.length != 0 ? apartment.complaints.map((_, i) => { 
-                    return <li key={i}>{apartment.complaints[i].date.substring(0,10)} [ Status: {apartment.complaints[i].status} ] {apartment.complaints[i].desc}  </li>
+                {apartment.complaints.length != 0 ? <b>311 Complaint:</b> : null}
+                {apartment.complaints.length != 0 ? apartment.complaints.map((_, i) => { 
+                    return <li key={i}>{apartment.complaints[i].date.substring(0,10)} [ Status: {apartment.complaints[i].status} ] {apartment.complaints[i].category}: {apartment.complaints[i].desc}</li>
                   }) : (
                     null
                   )
                 }
               </div>
               <div>
-                <b>Housing Violations</b>
-                { apartment.violations.length != 0 ? apartment.violations.map((_, i) => { 
-                    // return <li key={i}>{apartment.violations[i].date.substring(0,10)} [ Status: {apartment.violations[i].status} ] {apartment.violations[i].desc}  </li>
+                {apartment.violations.length != 0 ? <b>Housing Violations</b> : null}
+                {apartment.violations.length != 0 ? apartment.violations.map((_, i) => { 
+                    return <li key={i}>{apartment.violations[i].date.substring(0,10)} [ Status: {apartment.violations[i].status} ] {apartment.violations[i].desc}</li>
                   }) : (
                     null
                   )
                 }
+              </div>
+              <div>
+                {apartment.reviews.length != 0 ? <b>User Reviews:</b> : null}
+                {apartment.reviews != undefined ? 
+                  apartment.reviews.map((reviews, i) => (
+                  <Reviews key={i} review={reviews}/>
+                )) : (
+                  null
+                )}
               </div>
             </Card.Body>
             <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => HideDetailsClicked()}>Hide Details</Button>
@@ -221,7 +228,108 @@ const Search = (props) => {
     }
     return null
   }
-  
+
+  const RenderNonZillowResponse = () => {
+    const response = searchResponse;
+    if (response === undefined ) {
+      return (
+        <div></div>
+      )
+    } else if ((response.complaints.length === 0 && response.violations.length === 0 && response.reviews.length === 0)) {
+      return (
+        <div>
+        No Results Matched Your Query
+      </div>
+      )
+    } else if (response.complaints != undefined || response.violations != undefined || response.reviews != undefined) {
+      return (
+        <div className="result-cards">
+            {response.reviews.length != 0 ? <b>User Reviews:</b> : null}
+            {response.reviews != undefined ? 
+              response.reviews.map((reviews, i) => (
+              <Reviews key={i} review={reviews} />
+            )) : (
+              null
+            )}
+            {response.complaints.length != 0 ? <b>311 Complaints:</b> : null}
+            {response.complaints != undefined ? 
+              response.complaints.map((complaint, i) => (
+              <Complaints key={i} complaint={complaint} />
+            )) : (
+              null
+            )}
+            {response.violations.length != 0 ? <b>Housing Violations:</b> : null}
+            {response.violations != undefined ? 
+              response.violations.map((violation, i) => (
+              <Violations key={i} violation={violation} />
+            )) : (
+              null
+            )}
+        </div>
+      )
+    }
+  }
+
+  const Reviews = ({review}) => (
+    <Card className="card" style={{width: '750px'}}>
+      <Card.Img variant="top" src={review.userPhoto.url} style={{height: '20vw'}}/>
+      <Card.Body>
+        <Card.Title>
+        </Card.Title>
+          <Card.Text>
+            <b>{review.date}</b>
+          </Card.Text>
+          <Card.Text>
+            <b>Rating:</b> {review.rating} / 5
+          </Card.Text>
+          <Card.Text>
+            <b>Review:</b> {review.comment}
+          </Card.Text>
+          <Card.Text>
+            <b>User:</b> {review.user}
+          </Card.Text>
+      </Card.Body>
+    </Card>
+  )
+
+  const Complaints = ({complaint}) => (
+    <Card className="card" style={{width: '750px'}}>
+      <Card.Body>
+        <Card.Title>
+        </Card.Title>
+          <Card.Text>
+          {complaint.date.substring(0,10)} [ Status: {complaint.status} ] {complaint.category}: {complaint.desc}
+          </Card.Text>
+      </Card.Body>
+    </Card>
+  )
+
+  const Violations = ({violation}) => (
+    <Card className="card">
+      <Card.Body>
+        <Card.Title>
+        </Card.Title>
+          <div>
+            {violation.desc}
+          </div>
+      </Card.Body>
+    </Card>
+  )
+
+  const ExpandDetailsClicked = ({apartment}) => { 
+    setDetailsButtonClicked(true);
+    setApartmentDetails(apartment);
+  }
+
+  const HideDetailsClicked = () => { 
+    setDetailsButtonClicked(false);
+    setApartmentDetails({});
+  }
+
+  const refreshPage = ()=>{
+    window.location.reload();
+ }
+
   const RenderMapPins = () => {
     const response = searchResponse;
     if (response === undefined) {
@@ -280,7 +388,6 @@ const Search = (props) => {
     }   
   }
 
-
   return (
     <div className="search-container">
       <Helmet>
@@ -305,10 +412,10 @@ const Search = (props) => {
             <div className="zillow-checkbox">
               <div className="row">
                 <div className="column" style={{width: '24px'}}>
-                  <input type="checkbox" defaultChecked={zillow} onChange={zillowCheckBox}/>
-                </div>
-                <div className="column" style={{width: '20px'}}>
-                  <label>Zillow</label>
+                <label className="container" style={{flex: 1, flexDirection: 'row', width: 160}}>Zillow Results
+                  <input type="checkbox" className="checkmark" defaultChecked={zillow} onChange={zillowCheckBox}/>
+                  <span className="checkmark"></span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -331,17 +438,17 @@ const Search = (props) => {
               <NavigationControl showCompass={false} />
             </div>
           </ReactMapGL>
-        ): (
+        ) : (
           <h1>Loading...</h1>
         )}
       </div>
       <div className="row">
           <div className="column">
-            <RenderResponse/>
+            {(zillow) ? <RenderZillowResponse/> : <RenderNonZillowResponse/>}
           </div>
           <div className="column">
             <div className="result-cards">
-              {buttonClicked ? <ApartmentDetails/> : null }
+              {detailsButtonClicked ? <ApartmentDetails/> : null}
             </div>
           </div>
       </div>
