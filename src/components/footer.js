@@ -36,7 +36,6 @@ const Footer = (props) => {
                 <br className=""></br>
                 <span className="">Brooklyn, NY 11226</span>
                 <br className=""></br>
-                <span className="">&amp;#8203;</span>
               </span>
             </div>
           </div>
@@ -56,15 +55,6 @@ const Footer = (props) => {
         <span className="">{props.text10}</span>
         <span className="footer-text18">
           <span className="">All rights recived @ PowerRenter</span>
-          <span className="">
-            | Designed by
-            <span
-              dangerouslySetInnerHTML={{
-                __html: ' ',
-              }}
-            />
-          </span>
-          <span className="footer-text21">teleporhq.io</span>
           <span className="">
             <span
               dangerouslySetInnerHTML={{
