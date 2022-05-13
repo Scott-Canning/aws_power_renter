@@ -102,13 +102,9 @@ const Search = (props) => {
   };
 
   const zillowCheckBox = () => {
-    if(zillow && search) {
-      setSearchResponse(undefined);
-      setDetailsButtonClicked(false);
-      setZillow(!zillow);
-    } else {
-      setZillow(!zillow);
-    }
+    setSearchResponse(undefined);
+    setDetailsButtonClicked(false);
+    setZillow(!zillow);
   }
 
   const RenderZillowResponse = () => {
@@ -127,7 +123,8 @@ const Search = (props) => {
         )
     }
     return (
-      <div>No Results Matched Your Query</div>
+      <div style={{width: '250px', margin: 'auto', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
+      No Results Matched Your Query</div>
     )
   }
 
