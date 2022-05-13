@@ -109,6 +109,10 @@ const AddReview = (props) => {
     setSelectedFile('');
     setProgress(0);
     setLoadingDone(true)
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
   const uploadFile = (file) => {
@@ -246,8 +250,8 @@ const AddReview = (props) => {
         </form>
 
         : apiResponse ? <div>
-                              <div>{apiResponse}</div>
-                              <div className="add-review-container5">Please reload the page to make another review.</div>
+                              <div align="center"><h2>{apiResponse}</h2></div>
+                              <div className="add-review-container5" align="center">Please reload the page to make another review.</div>
                               </div>: <div>
                               <div className="loader-spinner"></div></div>} </div>
         
