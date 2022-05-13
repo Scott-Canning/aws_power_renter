@@ -102,13 +102,9 @@ const Search = (props) => {
   };
 
   const zillowCheckBox = () => {
-    if(zillow && search) {
-      setSearchResponse(undefined);
-      setDetailsButtonClicked(false);
-      setZillow(!zillow);
-    } else {
-      setZillow(!zillow);
-    }
+    setSearchResponse(undefined);
+    setDetailsButtonClicked(false);
+    setZillow(!zillow);
   }
 
   const RenderZillowResponse = () => {
@@ -128,7 +124,8 @@ const Search = (props) => {
     }
     return (
       <div style={{width: '250px', margin: 'auto', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
-      No Results Matched Your Query</div>
+      No Results Matched Your Query
+      </div>
     )
   }
 
@@ -164,12 +161,20 @@ const Search = (props) => {
   )
 
   const ExpandDetailsClicked = ({apartment}) => { 
-    setDetailsButtonClicked(true);
-    setApartmentDetails(apartment);
-    window.scrollTo({
-      top: 700,
-      behavior: 'smooth',
-    });
+    if (zillow){
+      setDetailsButtonClicked(true);
+      setApartmentDetails(apartment);
+      window.scrollTo({
+        top: 700,
+        behavior: 'smooth',
+      });
+    } else {
+      window.scrollTo({
+        top: 700,
+        behavior: 'smooth',
+      });
+    }
+
   }
 
   const HideDetailsClicked = () => { 
@@ -334,7 +339,7 @@ const Search = (props) => {
   )
 
 
-  const refreshPage = ()=>{
+  const refreshPage = () => {
     window.location.reload();
  }
 
@@ -357,10 +362,10 @@ const Search = (props) => {
         )
     } else if (response.length != 0 && !zillow) {
       return (
-        <Marker longitude={response.longitude} 
-                latitude={response.latitude} 
-                anchor="bottom" 
-                onClick={() => setCurrentlySelectedPin({longitude: response.longitude,latitude: response.latitude})}>
+        <Marker key={1} longitude={response.longitude} 
+          latitude={response.latitude} 
+          anchor="bottom" 
+          onClick={() => setCurrentlySelectedPin({longitude: response.longitude,latitude: response.latitude})}>
           <img src={pin} width="30" height="30"/>
         </Marker>
       )
@@ -381,8 +386,8 @@ const Search = (props) => {
           response.map((apartment, i) => (popupHider(apartment, i)))   
         )
     } else if (response.length != 0 && !zillow) {
-      return (
-        popupHider(response, 0)
+      return(
+        popupHider(response, 1)
       )
     }
     return (
@@ -434,7 +439,6 @@ const Search = (props) => {
               <button className="button-primary button" style={{margin: 'auto', width: '75%'}} onClick={searchClicked}> Search </button>
             </div>
             <div className="zillow-checkbox">
-
               <div className="row">
                 <div className="column" >
                 <label className="container" style={{flex: 1, flexDirection: 'row', width: 160}}>Zillow Results
