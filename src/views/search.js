@@ -15,6 +15,7 @@ import "mapbox-gl/dist/mapbox-gl.css"
 import './search.css'
 import axios from 'axios';
 import { Card, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom'
 
 
 Amplify.configure(awsconfig);
@@ -160,6 +161,21 @@ const Search = (props) => {
       </Card.Body>
     </Card>
   )
+
+  const ExpandDetailsClicked = ({apartment}) => { 
+    setDetailsButtonClicked(true);
+    setApartmentDetails(apartment);
+    window.scrollTo({
+      top: 700,
+      behavior: 'smooth',
+    });
+  }
+
+  const HideDetailsClicked = () => { 
+    setDetailsButtonClicked(false);
+    setApartmentDetails({});
+  }
+
 
   const ApartmentDetails = () => {
     let apartment = apartmentDetails;
@@ -316,15 +332,6 @@ const Search = (props) => {
     </Card>
   )
 
-  const ExpandDetailsClicked = ({apartment}) => { 
-    setDetailsButtonClicked(true);
-    setApartmentDetails(apartment);
-  }
-
-  const HideDetailsClicked = () => { 
-    setDetailsButtonClicked(false);
-    setApartmentDetails({});
-  }
 
   const refreshPage = ()=>{
     window.location.reload();
@@ -375,9 +382,12 @@ const Search = (props) => {
         <Popup  key={i} longitude={apartment.longitude}  latitude={apartment.latitude} 
         anchor="bottom"
         onClose={() => setCurrentlySelectedPin({longitude: '',latitude: ''})}>
-        <div>
-        <div>{apartment.search_address}</div>
-        <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => ExpandDetailsClicked({apartment})}>Expand Details</Button>
+        <div align="center">
+          <div align="center">{apartment.search_address}</div>
+          <Button className="button-secondary button button-md" style={{marginTop: '15px'}} onClick={() => ExpandDetailsClicked({apartment})}>Expand Details</Button>
+          <div align="center">
+            <Link to="/add-review" className="button-secondary button button-md" style={{marginTop: '10px'}}> Add Review </Link>
+          </div>
         </div>
         </Popup>
       )
@@ -410,6 +420,7 @@ const Search = (props) => {
               <button className="button-primary button" style={{margin: 'auto', width: '75%'}} onClick={searchClicked}> Search </button>
             </div>
             <div className="zillow-checkbox">
+
               <div className="row">
                 <div className="column" style={{width: '24px'}}>
                 <label className="container" style={{flex: 1, flexDirection: 'row', width: 160}}>Zillow Results
