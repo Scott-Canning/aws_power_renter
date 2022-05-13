@@ -25,7 +25,7 @@ const Footer = (props) => {
             <div className="footer-contact-container">
               <span className="footer-text08">{props.text9}</span>
               <span className="footer-text09">
-                <span className="">5 Metrotech Center,</span>
+                <span className="">5 Metrotech Center</span>
                 <span className="">
                   <span
                     dangerouslySetInnerHTML={{

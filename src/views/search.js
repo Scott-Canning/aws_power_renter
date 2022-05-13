@@ -54,7 +54,6 @@ const Search = (props) => {
     zoom: 11,
   });
 
-
   React.useEffect(() => {
     const fetchCredentials = async () => {
       setCredentials(await Auth.currentUserCredentials());
@@ -99,9 +98,10 @@ const Search = (props) => {
   };
 
   const zillowCheckBox = () => {
-    if(zillow && search != "") {
-      refreshPage();
-      setZillow(!zillow)
+    if(zillow && search) {
+      setSearchResponse(undefined);
+      setDetailsButtonClicked(false);
+      setZillow(!zillow);
     } else {
       setZillow(!zillow);
     }
@@ -191,7 +191,7 @@ const Search = (props) => {
                 {apartment.url != "" ? <a href={apartment.url} target="_blank" style={{color: 'blue'}}>Read More</a> : null}
               </Card.Text>
               <div>
-                {apartment.complaints.length != 0 ? <b>311 Complaint:</b> : null}
+                {apartment.complaints.length != 0 ? <b>311 Complaints:</b> : null}
                 {apartment.complaints.length != 0 ? apartment.complaints.map((_, i) => { 
                     return <li key={i}>{apartment.complaints[i].date.substring(0,10)} [ Status: {apartment.complaints[i].status} ] {apartment.complaints[i].category}: {apartment.complaints[i].desc}</li>
                   }) : (
@@ -234,7 +234,7 @@ const Search = (props) => {
       )
     } else if ((response.complaints.length === 0 && response.violations.length === 0 && response.reviews.length === 0)) {
       return (
-        <div>
+        <div style={{width: '250px', margin: 'auto'}}>
         No Results Matched Your Query
       </div>
       )
@@ -350,7 +350,7 @@ const Search = (props) => {
             </div>
             <div className="zillow-checkbox">
               <div className="row">
-                <div className="column" style={{width: '24px'}}>
+                <div className="column" >
                 <label className="container" style={{flex: 1, flexDirection: 'row', width: 160}}>Zillow Results
                   <input type="checkbox" className="checkmark" defaultChecked={zillow} onChange={zillowCheckBox}/>
                   <span className="checkmark"></span>

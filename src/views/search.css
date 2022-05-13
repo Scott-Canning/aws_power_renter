@@ -218,6 +218,7 @@
   left: 0;
   height: 25px;
   width: 25px;
+  /* padding-left:2px; */
   background-color: #eee;
 }
 

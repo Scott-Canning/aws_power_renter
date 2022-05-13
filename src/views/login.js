@@ -27,7 +27,7 @@ const Login = (props) => {
     <div style={styles.container_sc}> 
         <Authenticator>
           {({ signOut, user }) => (
-            <div>
+            <div style={{width: '350px', margin: 'auto'}}>
               <h1>Logged in as {user.username}</h1>
               <button className="button-primary button" onClick={() => signOut()}>Sign Out</button>
             </div>
@@ -39,8 +39,8 @@ const Login = (props) => {
 
 const styles = {
   container: { width: 400, margin: 'auto', display: 'flex', flexDirection: 'center', justifyContent: 'center', padding: 20 },
-  container_sc: {width: 400, margin: '0 auto', display: 'flex', alignItems: 'column', justifyContent: 'center', padding: 200 },
-  todo: {  marginBottom: 15 },
+  container_sc: {width: 400, margin: 'auto', display: 'flex', alignItems: 'column', textAlign: 'center', paddingTop: 150 },
+  todo: { marginBottom: 15 },
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
   todoName: { fontSize: 20, fontWeight: 'bold' },
   todoDescription: { marginBottom: 0 },
