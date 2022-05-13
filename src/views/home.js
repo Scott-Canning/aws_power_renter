@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from "react-router-dom";
 import { Helmet } from 'react-helmet'
 import Navigation from '../components/navigation'
 import ServicesCard from '../components/services-card'
@@ -8,7 +9,12 @@ import './home.css'
 
 const Home = (props) => {
 
-  
+  const history = useHistory();
+  const routeChange = () => { 
+    let path = '/search'; 
+    history.push(path);
+  }
+
   return (
     <div className="home-container">
       <Helmet>
@@ -80,7 +86,7 @@ const Home = (props) => {
                   />
                 </span>
               </span>
-              <button className="home-primary button-primary button-lg button">
+              <button className="home-primary button-primary button-lg button" onClick={routeChange}>
                 Start your search now!
               </button>
             </div>
