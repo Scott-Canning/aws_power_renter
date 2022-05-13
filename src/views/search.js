@@ -127,7 +127,8 @@ const Search = (props) => {
         )
     }
     return (
-      <div>No Results Matched Your Query</div>
+      <div style={{width: '250px', margin: 'auto', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
+      No Results Matched Your Query</div>
     )
   }
 
@@ -343,7 +344,7 @@ const Search = (props) => {
       return (
         null
       )
-    } else if (response.length != 0) {
+    } else if (response.length != 0 && zillow) {
         return (
               response.map((apartment, i) => (
                 <Marker key={i} longitude={apartment.longitude} 
@@ -354,6 +355,15 @@ const Search = (props) => {
                 </Marker>
               ))    
         )
+    } else if (response.length != 0 && !zillow) {
+      return (
+        <Marker longitude={response.longitude} 
+                latitude={response.latitude} 
+                anchor="bottom" 
+                onClick={() => setCurrentlySelectedPin({longitude: response.longitude,latitude: response.latitude})}>
+          <img src={pin} width="30" height="30"/>
+        </Marker>
+      )
     }
     return (
       null
@@ -366,10 +376,14 @@ const Search = (props) => {
       return (
         null
       )
-    } else if (response.length != 0) {
+    } else if (response.length != 0 && zillow) {
         return (
-              response.map((apartment, i) => (popupHider(apartment, i)))   
+          response.map((apartment, i) => (popupHider(apartment, i)))   
         )
+    } else if (response.length != 0 && !zillow) {
+      return (
+        popupHider(response, 0)
+      )
     }
     return (
       null
